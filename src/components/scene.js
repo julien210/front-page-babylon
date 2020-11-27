@@ -1,76 +1,123 @@
 import React, { useRef } from 'react';
-import { ActionManager } from '@babylonjs/core/Actions/actionManager';
+
 import { ExecuteCodeAction } from '@babylonjs/core/Actions';
 import { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight';
-import { FreeCamera } from '@babylonjs/core/Cameras/freeCamera';
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import BabylonScene from 'babylonjs-hook';
 import './scene.css';
 
-let box;
-let babylonLink;
+//new
+import { GridMaterial } from "@babylonjs/materials/grid/gridMaterial";
+import '@babylonjs/core/Materials/Textures/Loaders/ddsTextureLoader';
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { GroundBuilder } from '@babylonjs/core';
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import '@babylonjs/loaders/glTF/2.0/glTFLoader';
 
-const onSceneReady = scene => {
-  // This creates and positions a free camera (non-mesh)
-  var camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+//new2
+import { ActionManager } from '@babylonjs/core/Actions/actionManager';
 
-  // This targets the camera to scene origin
-  camera.setTarget(Vector3.Zero());
+// GUI
+import * as GUI from '@babylonjs/gui';
 
-  const canvas = scene.getEngine().getRenderingCanvas();
+import { navigateTo } from 'gatsby';
+
+
+// let box;
+// let babylonLink;
+
+const onSceneReady = async (scene) => { 
+
+const camera = new FreeCamera("camera1", new Vector3(1.5, 2, -5.5), scene);
+
+
+const canvas = scene.getEngine().getRenderingCanvas();
 
   // This attaches the camera to the canvas
-  camera.attachControl(canvas, true);
+camera.attachControl(canvas, true);
 
+  // Create a grid material  
+const gridMaterial = new GridMaterial("grid", scene);
+
+scene.ambientColor = new Color3(1, 1, 1);
   // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-  var light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 
-  // Default intensity is 1. Let's dim the light a small amount
-  light.intensity = 0.7;
+const light = new HemisphericLight("hemiLight", new Vector3(-1, 1, 0), scene);
+  light.diffuse = new Color3(1, 0.5, 1, 0.21);
+  light.intensity =1;
+ 
 
-  // Our built-in 'box' shape.
-  box = MeshBuilder.CreateBox("box", {size: 2}, scene);
+  const ground = GroundBuilder.CreateGround("ground", {width: 10, height: 15}, scene);
+  ground.position.z = 2;
+  ground.material = gridMaterial
+  ground.rotation.y= Math.PI /2
+  
 
-  // Move the box upward 1/2 its height
-  box.position.y = 1;
 
-  // Register click event on box mesh
-  box.actionManager = new ActionManager(scene);
-  box.actionManager.registerAction(
-    new ExecuteCodeAction(
-        ActionManager.OnPickTrigger,
-        () => {
-          babylonLink.current.click()
-        }
-    )
-  );
+  SceneLoader.ImportMesh("", "https://cx20.github.io/gltf-test/sampleModels/BrainStem/glTF/","BrainStem.gltf", scene, function (newMeshes) {
+  //SceneLoader.ImportMesh("", "https://raw.githubusercontent.com/julien210/thion/julien210-assets/", "coin.gltf", scene, function (newMeshes) {
+  
+  const perso =  newMeshes[0];
+  perso.position.x = 2;
+  perso.position.y = 0;   
+  perso.position.z = 2;
+  perso.isVisible = false;
 
-  // Our built-in 'ground' shape.
-  MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+  });
+
+/////////////////// BABYLON HUI
+
+const manager = new GUI.GUI3DManager(scene);
+
+// Create a horizontal stack panel
+const panel = new GUI.StackPanel3D();
+panel.margin = 0.02;
+
+manager.addControl(panel);
+panel.position.z = -0.5;
+panel.position.x = 0.5;
+panel.position.y = 0.5;
+
+
+// Let's add some buttons!
+const  addButton = function() {
+const button = new GUI.Button3D("orientation");
+  panel.addControl(button);
+  button.onPointerUpObservable.add(function(){
+    navigateTo('login')
+  });      
+const text1 = new GUI.TextBlock();
+  text1.text = "Login";
+  text1.color = "purple";
+  text1.fontSize = 60;
+button.content = text1;  
 }
 
-/**
- * Will run on every frame render.  We are spinning the box on y-axis.
- */
-const onRender = scene => {
-  if (box !== undefined) {
-    var deltaTimeInMillis = scene.getEngine().getDeltaTime();
+addButton()
+}
 
-    const rpm = 10;
-    box.rotation.y += ((rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000));
+
+const onRender = (scene) => {
+  const coin = scene.meshes[0];
+  console.log(coin)
+
+  if (coin !== undefined) {
+    var deltaTimeInMillis = scene.getEngine().getDeltaTime();
+    const rpm = 3;
+    coin.rotation.y += ((rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000));  
   }
 }
-
 export default () => {
-  babylonLink = useRef(null);
+//   babylonLink = useRef(null);
 
   return (
     <>
-      <BabylonScene antialias onSceneReady={onSceneReady} onRender={onRender} id='render-canvas' />
-      <a ref={babylonLink} target="_blank" rel="noopener noreferrer" href="https://www.babylonjs.com/">
+      <BabylonScene antialias onSceneReady={onSceneReady}  onRender={onRender} id='render-canvas' />
+      {/* <a ref={babylonLink} target="_blank" rel="noopener noreferrer" href="https://www.babylonjs.com/">
         Babylon documentation
-      </a>
+      </a> */}
     </>
   )
 }

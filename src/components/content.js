@@ -2,13 +2,19 @@ import React from "react"
 
 import "./content.css"
 
-const Content = () => (
+const Content = () => {
+
+return(
   <div className="content">
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby-Babylon site.</p>
-    <p>Click on the rotating box and go build something great.</p>
-    <p>You can use mouse and arrow keys to move around.</p>
+    <p>Bonjour,</p>
+    <p>De formation scientifique </p>
+    <p>j' ai d'abord été Cuisinier puis tour à tour Entrepreneur et Enseignant</p>
+    <p>A présent je me passionne pour le développement Web</p>
+    <p>et tout particulièrement Gatsby React et le jamstack .</p>
+    <p>Platon disait "A pratiquer plusieurs métiers, on ne réussit dans aucun".</p>
+    <p>Moi ...je travaille à être heureux : c'est le plus beau des métiers."Roland de Lassus"</p>
   </div>
-)
+  )
+}
 
 export default Content

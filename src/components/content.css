@@ -1,11 +1,13 @@
 .content {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 10;
   left: 0;
   padding: 11vh 0 0 9%;
-  width: 25%;
-  min-width: 292px;
+  min-width: 40%;
   pointer-events: none;
-  z-index: 99;
-  color: white;
+  font-weight: 600;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  z-index: 1;
+  line-height: 80%;
+  color: rgba(235, 240, 252, 0.774);
 }

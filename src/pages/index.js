@@ -1,7 +1,7 @@
 import React from "react"
 
 import Layout from "../components/layout"
-import Content from "../components/Content"
+import Content from "../components/content"
 import SEO from "../components/seo"
 import Scene from  "../components/scene"
 
